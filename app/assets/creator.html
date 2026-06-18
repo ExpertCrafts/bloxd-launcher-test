@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facet Creator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./data/scroll.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1b1a1a 0%, #171616 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .creator-container {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .logo {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #ff6b39, #ff8c5a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      color: #a0a0a0;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
+
+    .creator-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+    }
+    
+    @media (min-width: 1000px) {
+      .creator-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .wide-button {
+      grid-column: 1 / -1;
+      background: linear-gradient(45deg, #ff6b39, #ff8c5a);
+      border: none;
+      color: white;
+      font-weight: bold;
+      font-size: 1.5rem;
+      padding: 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      height: 20vh;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 20px rgba(255, 107, 57, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wide-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .wide-button:hover::before {
+      left: 100%;
+    }
+
+    .wide-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(255, 107, 57, 0.4);
+    }
+
+    .tips-card {
+      grid-column: span 2;
+      background: linear-gradient(145deg, #262525, #212020);
+      border: 1px solid #3a3939;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      cursor: default;
+      transition: all 0.3s ease;
+      height: 350px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tips-header {
+      text-align: center;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #3a3939;
+      margin-bottom: 15px;
+    }
+
+    .tips-header h2 {
+      color: #ff8c5a;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .carousel-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .carousel {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+
+    .carousel-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .carousel-slide.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .carousel-slide h3 {
+      color: #ff8c5a;
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .carousel-slide p {
+      color: #bbb;
+      font-size: 1rem;
+      text-align: center;
+      line-height: 1.5;
+      max-width: 80%;
+    }
+
+    .carousel-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #3a3939;
+      color: #e8e8e8;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 107, 57, 0.2);
+      border-color: #ff8c5a;
+    }
+
+    .indicators {
+      display: flex;
+      gap: 8px;
+    }
+
+    .indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #444;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .indicator.active {
+      background: #ff8c5a;
+      transform: scale(1.2);
+    }
+
+    .big-btn {
+      background: linear-gradient(145deg, #262525, #212020);
+      border: 1px solid #3a3939;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      height: 350px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .big-btn:hover {
+      opacity: 1;
+      transform: translateY(-8px);
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+      border-color: #4a4949;
+    }
+
+    .btn-title {
+      background: linear-gradient(90deg, #2e2e2e, #2a2a2a);
+      border: 1px solid #444343;
+      padding: 12px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      width: 100%;
+      text-align: center;
+      color: #e8e8e8;
+      z-index: 1;
+    }
+
+    .btn-image {
+      width: 100%;
+      height: 220px;
+      background-size: cover;
+      background-position: center;
+      border-radius: 15px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      outline: 1px solid #444343;
+    }
+
+    .btn-content {
+      margin-top: 15px;
+      color: #bbb;
+      font-size: 0.9rem;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .creator-grid>* {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .wide-button {
+      animation-delay: 0.1s;
+    }
+
+    .big-btn:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .big-btn:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .fullscreen-frame {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      z-index: 80;
+      display: none;
+    }
+
+    .floating-window {
+      position: fixed;
+      background: linear-gradient(145deg, #262525, #212020);
+      border: 1px solid #3a3939;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      z-index: 100000;
+      min-width: 600px;
+      min-height: 400px;
+      max-width: 95vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      resize: both;
+    }
+
+
+    .window-header {
+      background: linear-gradient(90deg, #2e2e2e, #2a2a2a);
+      padding: 10px 15px;
+      cursor: move;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #444343;
+    }
+
+    .window-title {
+      font-weight: 600;
+      color: #e8e8e8;
+      user-select: none;
+    }
+
+    .window-close {
+      background: none;
+      border: none;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 5px;
+    }
+
+    .window-content {
+      flex: 1;
+      padding: 15px;
+      overflow: auto;
+    }
+
+    .window-content:has(iframe:only-child),
+    .window-content.iframe-only {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .window-content iframe:only-child {
+      width: 100%;
+      height: 100%;
+      border: none;
+      min-height: 400px;
+      flex: 1;
+    }
+
+    .window-content.iframe-only {
+      height: 100%;
+      min-height: 400px;
+      flex: 1;
+    }
+
+    #mobile-landscape-lock {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10002;
+      background: radial-gradient(circle at center, #1f1b1b 0%, #141313 70%);
+      color: #f1f1f1;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    #mobile-landscape-lock .lock-content {
+      max-width: 320px;
+    }
+
+    #mobile-landscape-lock .lock-icon {
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+      color: #ff6b39;
+    }
+
+    #mobile-landscape-lock h2 {
+      margin: 0 0 8px 0;
+      font-size: 1.2rem;
+      color: #ffffff;
+    }
+
+    #mobile-landscape-lock p {
+      margin: 0;
+      color: #bdbdbd;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .mobile-creator-note {
+      display: none;
+      background: rgba(255, 107, 57, 0.12);
+      border: 1px solid rgba(255, 140, 90, 0.45);
+      color: #ffd9ca;
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) and (pointer: coarse) and (orientation: landscape) {
+      body {
+        padding: 8px;
+      }
+
+      .creator-container {
+        gap: 10px;
+      }
+
+      .mobile-creator-note {
+        display: block;
+      }
+
+      .creator-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .tips-card {
+        grid-column: span 2;
+        height: 200px;
+        padding: 10px;
+        border-radius: 14px;
+      }
+
+      .tips-header {
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+      }
+
+      .tips-header h2 {
+        font-size: 1rem;
+      }
+
+      .carousel-slide h3 {
+        font-size: 1rem;
+      }
+
+      .carousel-slide p {
+        font-size: 0.78rem;
+        max-width: 96%;
+      }
+
+      .logo,
+      .subtitle {
+        display: none;
+      }
+
+      .big-btn {
+        height: 180px;
+        padding: 10px;
+        border-radius: 14px;
+      }
+
+      .btn-title {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        padding: 6px;
+      }
+
+      .btn-image {
+        height: 100px;
+      }
+
+      .btn-image i {
+        font-size: 2.6rem !important;
+      }
+
+      .btn-content {
+        margin-top: 8px;
+        font-size: 0.72rem;
+        line-height: 1.25;
+      }
+
+      .nav-btn {
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+    @media (max-width: 900px) and (pointer: coarse) and (orientation: portrait) {
+      #main-content,
+      .fullscreen-frame,
+      #esc-instruction {
+        display: none !important;
+      }
+
+      #mobile-landscape-lock {
+        display: flex;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="mobile-landscape-lock">
+    <div class="lock-content">
+      <div class="lock-icon"><i class="fas fa-mobile-alt"></i></div>
+      <h2>Rotate Your Phone</h2>
+      <p>Facet mobile is available in landscape mode only.</p>
+    </div>
+  </div>
+
+  <div id="main-content" class="creator-container">
+    <div class="header">
+
+    </div>
+
+    <div class="mobile-creator-note">
+      Mobile note: Facet works better on other sections. Creator is the only section that does not work well on mobile.
+    </div>
+
+    <div class="creator-grid">
+      <div class="tips-card">
+        <div class="tips-header">
+          <h2 id="welcome-message">Loading...</h2>
+        </div>
+        <div class="carousel-container">
+          <div class="carousel">
+            <div class="carousel-slide active">
+              <div class="logo">FACET Creator</div>
+              <div class="subtitle">Powerful tools to bring your creative vision to life</div>
+            </div>
+            <div class="carousel-slide">
+              <h3>Tip</h3>
+              <p>Did you know you could see how many FPS facet is taking from you? Go to the menu and check the metrics.
+              </p>
+            </div>
+            <div class="carousel-slide">
+              <h3>ForceFace coder</h3>
+              <p>Its not good.</p>
+            </div>
+            <div class="carousel-slide">
+              <h3>Record Gameplay</h3>
+              <p>Capture your creations with the built-in recorder. Perfect for showcasing your builds to others.</p>
+            </div>
+            <div class="carousel-slide">
+              <h3>New: Voxel Modeler</h3>
+              <p>Create amazing 3D voxel art with our new modeling tool. Choose grid sizes, paint voxels, and export to GLB!</p>
+            </div>
+          </div>
+          <div class="carousel-nav">
+            <button class="nav-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
+            <div class="indicators">
+              <span class="indicator active" data-index="0"></span>
+              <span class="indicator" data-index="1"></span>
+              <span class="indicator" data-index="2"></span>
+              <span class="indicator" data-index="3"></span>
+              <span class="indicator" data-index="4"></span>
+            </div>
+            <button class="nav-btn next-btn"><i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="big-btn" data-url="./data/iframes/editor.html">
+        <div class="btn-title">Texture Editor</div>
+        <div class="btn-image"
+          style="background-image: url('./data/img/editor.png'); background-color: #2a2a2a; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-paint-brush" style="font-size: 4rem; color: #ff6b39;"></i>
+        </div>
+        <div class="btn-content">Make your own texture packs very easily.</div>
+      </div>
+
+      <div class="big-btn" data-url="./data/iframes/facecg.html">
+        <div class="btn-title">FaceCG</div>
+        <div class="btn-image"
+          style="background-color: #2a2a2a; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-sliders-h" style="font-size: 4rem; color: #ff6b39;"></i>
+        </div>
+        <div class="btn-content">Generate custom CSS instantly with a visual, no-code interface.</div>
+      </div>
+
+      <div class="big-btn" data-url="./data/iframes/imgtobloxd.html">
+        <div class="btn-title">Image to Bloxd</div>
+        <div class="btn-image"
+          style="background-color: #2a2a2a; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-image" style="font-size: 4rem; color: #ff6b39;"></i>
+        </div>
+        <div class="btn-content">Convert your images into plans for building them in game.</div>
+      </div>
+
+      <div class="big-btn" data-url="./data/iframes/bloxd-api.html">
+        <div class="btn-title">Bloxd API Explorer</div>
+        <div class="btn-image"
+          style="background-color: #2a2a2a; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-code" style="font-size: 4rem; color: #ff6b39;"></i>
+        </div>
+        <div class="btn-content">Explore the complete Bloxd JavaScript API documentation with interactive examples.</div>
+      </div>
+
+      <div class="big-btn" data-url="./data/iframes/ForceForge.html">
+        <div class="btn-title">ForceFace Coder</div>
+        <div class="btn-image"
+          style="background-color: #2a2a2a; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-robot" style="font-size: 4rem; color: #ff6b39;"></i>
+        </div>
+        <div class="btn-content">Its not good.</div>
+      </div>
+
+      <div class="big-btn" data-url="./data/iframes/voxel-modeler.html">
+        <div class="btn-title">Fac3D</div>
+        <div class="btn-image"
+          style="background-color: #2a2a2a; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-cube" style="font-size: 4rem; color: #ff6b39;"></i>
+        </div>
+        <div class="btn-content">Create 3D models with ease.</div>
+      </div>
+
+
+    </div>
+  </div>
+
+  <iframe class="fullscreen-frame"></iframe>
+
+  <div id="esc-instruction"
+    style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(145deg, #262525, #212020); border: 1px solid #3a3939; color: #e8e8e8; padding: 15px 30px; border-radius: 20px; z-index: 100; font-size: 1.1rem; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); font-weight: 500;">
+    Press ESC to close this app
+  </div>
+
+  <script>
+    window.addEventListener('message', function (event) {
+      if (event.data && event.data.action) {
+        if (event.data.action === 'hideAds' && event.data.userType === 'Pro') {
+          console.log('Pro user detected - no ads to hide on creator page');
+        } else if (event.data.action === 'showAds') {
+          console.log('Free user detected - no ads to show on creator page');
+        } else if (event.data.action === 'closeIframe') {
+          console.log('Iframe requested close via postMessage');
+          handleEscapeKey();
+        }
+      }
+    });
+
+    function makeDraggable(element, header) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+      header.onmousedown = dragMouseDown;
+
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        element.style.top = (element.offsetTop - pos2) + "px";
+        element.style.left = (element.offsetLeft - pos1) + "px";
+      }
+
+      function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
+
+    document.querySelectorAll('.big-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.dataset.url;
+        const iframe = document.querySelector('.fullscreen-frame');
+        const instruction = document.getElementById('esc-instruction');
+        iframe.src = url;
+        iframe.style.display = 'block';
+        document.getElementById('main-content').style.display = 'none';
+        instruction.style.display = 'block';
+
+        setTimeout(() => {
+          instruction.style.display = 'none';
+        }, 3000);
+      });
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const welcomeMessage = document.getElementById('welcome-message');
+      const hasVisited = localStorage.getItem('hasVisitedCreator');
+
+      if (!hasVisited) {
+        welcomeMessage.textContent = "You seem like a new one huh.";
+        localStorage.setItem('hasVisitedCreator', 'true');
+      } else {
+        const random = Math.random();
+        if (random < 0.2) {
+          const hour = new Date().getHours();
+          const minute = new Date().getMinutes().toString().padStart(2, '0');
+          welcomeMessage.textContent = `Is it ${hour}:${minute}?`;
+        } else {
+          const spookyMessages = [
+            "You've been here before",
+            "I see you again...",
+            "Back for more creation?",
+            "The creator awakens...",
+            "Your presence is noted.",
+            "Another session of creation?",
+            "The tools await your command.",
+            "We've been expecting you.",
+            "Im not alive or anything.",
+            "Welcome back, creator.",
+            "The workshop remembers you."
+          ];
+          const randomMessage = spookyMessages[Math.floor(Math.random() * spookyMessages.length)];
+          welcomeMessage.textContent = randomMessage;
+        }
+      }
+      const carouselSlides = document.querySelectorAll('.carousel-slide');
+      const indicators = document.querySelectorAll('.indicator');
+      const prevBtn = document.querySelector('.prev-btn');
+      const nextBtn = document.querySelector('.next-btn');
+      let currentIndex = 0;
+
+      function showSlide(index) {
+        carouselSlides.forEach((slide, i) => {
+          if (i === index) {
+            slide.style.opacity = '0';
+            slide.style.transform = 'translateX(100%)';
+            slide.classList.add('active');
+
+            setTimeout(() => {
+              slide.style.opacity = '1';
+              slide.style.transform = 'translateX(0)';
+            }, 10);
+          } else {
+            slide.classList.remove('active');
+            slide.style.opacity = '0';
+            slide.style.transform = 'translateX(-100%)';
+          }
+        });
+
+        indicators.forEach((indicator, i) => {
+          if (i === index) {
+            indicator.classList.add('active');
+          } else {
+            indicator.classList.remove('active');
+          }
+        });
+
+        currentIndex = index;
+      }
+
+      nextBtn.addEventListener('click', function () {
+        const nextIndex = (currentIndex + 1) % carouselSlides.length;
+        showSlide(nextIndex);
+      });
+
+      prevBtn.addEventListener('click', function () {
+        const prevIndex = (currentIndex - 1 + carouselSlides.length) % carouselSlides.length;
+        showSlide(prevIndex);
+      });
+
+      indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', function () {
+          showSlide(index);
+        });
+      });
+
+      setInterval(() => {
+        const nextIndex = (currentIndex + 1) % carouselSlides.length;
+        showSlide(nextIndex);
+      }, 5000);
+    });
+
+
+    function handleEscapeKey() {
+      const iframe = document.querySelector('.fullscreen-frame');
+      const instruction = document.getElementById('esc-instruction');
+      const mainContent = document.getElementById('main-content');
+
+      const isIframeVisible = iframe.style.display === 'block' ||
+        iframe.style.display === '' ||
+        window.getComputedStyle(iframe).display !== 'none';
+
+      if (isIframeVisible) {
+        console.log('ESC pressed - closing iframe');
+        iframe.style.display = 'none';
+        instruction.style.display = 'none';
+        mainContent.style.display = 'block';
+
+        iframe.src = '';
+
+        return false;
+      }
+      return true;
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        handleEscapeKey();
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        handleEscapeKey();
+      }
+    });
+
+    document.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
+          document.addEventListener('keydown', function tempKeyListener(e) {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              e.stopPropagation();
+              handleEscapeKey();
+              document.removeEventListener('keydown', tempKeyListener);
+            }
+          });
+        }
+      }, 100);
+    });
+  </script>
+</body>
+
+</html>
