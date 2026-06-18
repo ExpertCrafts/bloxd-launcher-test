@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wiki</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: #1b1a1a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #e0e0e0;
+    }
+
+    body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background: linear-gradient(135deg, #1b1a1a 0%, #171616 100%);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: linear-gradient(90deg, #262525 0%, #242323 100%);
+      border: 1px solid #3a3939;
+      border-radius: 24px;
+      margin-bottom: 10px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      font-size: 1.8rem;
+      color: #ff6b39;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #ff6b39, #ff8c5a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .search-container {
+      position: relative;
+      width: 60%;
+      max-width: 500px;
+    }
+
+    #searchInput {
+      padding: 14px 20px 14px 48px;
+      font-size: 1rem;
+      border-radius: 40px;
+      border: none;
+      background: #1f1e1e;
+      color: #e0e0e0;
+      outline: none;
+      display: block;
+      width: 100%;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.15);
+      border: 1px solid #3a3939;
+    }
+
+    #searchInput::placeholder {
+      color: #888;
+    }
+
+    #searchInput:focus {
+      border-color: #ff6b39;
+      box-shadow: 0 0 0 2px rgba(255, 107, 57, 0.2);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+    }
+
+    .categories {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 15px 5px;
+      max-width: 100vw;
+      scrollbar-width: thin;
+    }
+
+    .categories::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .categories::-webkit-scrollbar-thumb {
+      background-color: #ff6b39;
+      border-radius: 10px;
+    }
+
+    .category-btn {
+      background: linear-gradient(145deg, #262525, #212020);
+      border: 1px solid #444343;
+      border-radius: 24px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      color: #d8d8d8;
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .category-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      border-color: #555;
+    }
+
+    .category-btn.active-btn {
+      background: linear-gradient(90deg, #ff6b39 0%, #ff8c5a 100%);
+      border: 1px solid #f78c5a;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 6px 12px rgba(255, 107, 57, 0.25);
+    }
+
+    #itemGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+      padding: 10px 0 40px 0;
+    }
+
+    .item-card {
+      background: linear-gradient(145deg, #262525, #212020);
+      border: 1px solid #3a3939;
+      border-radius: 24px;
+      padding: 24px;
+      color: #d8d8d8;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .item-card .item-content {
+      padding: 8px 0;
+    }
+
+    .item-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+      border-color: #4a4949;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .item-title {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #f78c5a;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .item-tag {
+      font-size: 0.85rem;
+      background: linear-gradient(90deg, #ff6b39, #ff8c5a);
+      padding: 6px 12px;
+      border-radius: 16px;
+      color: #fff;
+      user-select: none;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .item-description {
+      font-size: 1.05rem;
+      color: #c0bebe;
+      line-height: 1.5;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .item-content {
+      font-size: 0.95rem;
+      color: #bbb;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      margin: 0;
+      flex-grow: 1;
+      padding: 8px 0;
+    }
+    
+    /* Enhanced styling for item content to better format structured data */
+    .item-content p {
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+    
+    .item-content strong {
+      color: #f78c5a;
+      font-weight: 600;
+    }
+    
+    /* Better spacing for key-value pairs in item content */
+    .item-content br {
+      line-height: 1.8;
+    }
+    
+    /* Style for specific item properties */
+    .item-property {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+      padding: 4px 0;
+    }
+    
+    .property-key {
+      font-weight: bold;
+      color: #f78c5a;
+    }
+    
+    .property-value {
+      color: #d8d8d8;
+      text-align: right;
+    }
+
+    .item-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      padding-top: 12px;
+      border-top: 1px solid #3a3939;
+      color: #888;
+      font-size: 0.85rem;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .item-action {
+      background: transparent;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .item-action:hover {
+      color: #ff6b39;
+      background: rgba(255, 107, 57, 0.1);
+    }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px;
+      color: #888;
+      font-size: 1.1rem;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      grid-column: 1 / -1;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #3a3939;
+      border-top: 4px solid #ff6b39;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px;
+      }
+
+      .search-container {
+        width: 100%;
+      }
+
+      #itemGrid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .item-card {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    
+    .hero-showcase {
+      display: flex;
+      gap: 32px;
+      background: linear-gradient(135deg, #262525 0%, #242323 100%);
+      border: 1px solid #3a3939;
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .hero-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 24px;
+    }
+    
+    .article-of-day {
+      flex: 0 0 400px; 
+      background: linear-gradient(145deg, #2a2929, #262525);
+      border: 1px solid #444343;
+      border-radius: 24px;
+      padding: 24px;
+      margin-right: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: fit-content;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .aot-title {
+      color: #f78c5a;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0 0 16px 0;
+      text-align: center;
+      border-bottom: 1px solid #3a3939;
+      padding-bottom: 12px;
+    }
+    
+    .aot-item {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .aot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    
+    .aot-title-item {
+      margin: 0;
+      font-size: 1.3rem;
+      color: #f78c5a;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    
+    .aot-tag {
+      font-size: 0.85rem;
+      background: linear-gradient(90deg, #ff6b39, #ff8c5a);
+      padding: 6px 12px;
+      border-radius: 16px;
+      color: #fff;
+      user-select: none;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+    
+    .aot-description {
+      font-size: 1rem;
+      color: #c0bebe;
+      line-height: 1.5;
+      font-weight: 500;
+      margin: 0;
+    }
+    
+    .aot-content {
+      font-size: 0.9rem;
+      color: #bbb;
+      line-height: 1.6;
+      margin: 0;
+      padding: 8px 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+    }
+    
+    .aot-read-more {
+      color: #ff6b39;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 10px;
+      text-align: center;
+    }
+    
+    .aot-read-more:hover {
+      text-decoration: underline;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #ff8c5a;
+      margin: 0;
+      line-height: 1.2;
+      background: linear-gradient(45deg, #ff6b39, #ff8c5a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: #c0bebe;
+      margin: 0;
+      line-height: 1.6;
+      max-width: 90%;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin: 16px 0;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      max-width: 120px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .stat-item.animate-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .stat-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+      color: #ff6b39;
+      background: rgba(255, 107, 57, 0.1);
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 107, 57, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .stat-item:hover .stat-icon {
+      transform: scale(1.1);
+      background: rgba(255, 107, 57, 0.2);
+      box-shadow: 0 0 15px rgba(255, 107, 57, 0.3);
+    }
+
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #e0e0e0;
+      transition: all 0.3s ease;
+    }
+
+    .stat-item:hover .stat-number {
+      color: #ff6b39;
+      text-shadow: 0 0 10px rgba(255, 107, 57, 0.5);
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .hero-btn {
+      padding: 14px 28px;
+      border-radius: 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+    }
+
+    .hero-btn.primary {
+      background: linear-gradient(90deg, #ff6b39 0%, #ff8c5a 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(255, 107, 57, 0.3);
+    }
+
+    .hero-btn.primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(255, 107, 57, 0.4);
+    }
+
+    .hero-btn.secondary {
+      background: linear-gradient(145deg, #3a3939, #2a2929);
+      color: #e0e0e0;
+      border: 1px solid #4a4949;
+    }
+
+    .hero-btn.secondary:hover {
+      background: linear-gradient(145deg, #4a4949, #3a3939);
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    @media (max-width: 968px) {
+      .hero-showcase {
+        flex-direction: column;
+      }
+
+      .hero-content {
+        text-align: center;
+        align-items: center;
+      }
+
+      .hero-subtitle {
+        max-width: 100%;
+      }
+
+      .hero-stats {
+        justify-content: center;
+      }
+
+      .hero-buttons {
+        justify-content: center;
+      }
+    }
+    
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+    }
+    
+    .modal.display-flex {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: linear-gradient(145deg, #262525, #212020);
+      margin: 0;  
+      padding: 0;
+      border: 1px solid #3a3939;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 85vh;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: modalopen 0.3s ease;
+    }
+    
+    @keyframes modalopen {
+      from {
+        opacity: 0;
+        transform: translateY(-60px);
+      }
+      
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px;
+      border-bottom: 1px solid #3a3939;
+      flex-shrink: 0;
+    }
+    
+    .modal-header h2 {
+      margin: 0;
+      color: #f78c5a;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    
+    .close {
+      color: #888;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .close:hover {
+      color: #ff6b39;
+      background: rgba(255, 107, 57, 0.1);
+    }
+    
+    .modal-body {
+      padding: 24px;
+      max-height: calc(85vh - 120px);
+      overflow-y: auto;
+      background: #1f1e1e;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .modal-category {
+      margin-bottom: 15px;
+    }
+    
+    .modal-description {
+      font-size: 1.05rem;
+      color: #c0bebe;
+      line-height: 1.5;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+    
+    .modal-content#modalContent {
+      font-size: 0.95rem;
+      color: #bbb;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      padding: 15px 24px;
+      border-top: 1px solid #3a3939;
+      margin-top: 15px;
+    }
+    
+    .modal-content#modalContent p {
+      margin: 10px 0;
+    }
+    
+    .modal-content#modalContent br {
+      line-height: 1.8;
+    }
+    
+    /* Specific formatting for structured content */
+    .modal-content#modalContent strong {
+      color: #f78c5a;
+      font-weight: 600;
+    }
+    
+    .modal-content#modalContent ul, .modal-content#modalContent ol {
+      padding-left: 20px;
+      margin: 10px 0;
+    }
+    
+    .modal-content#modalContent li {
+      margin: 5px 0;
+    }
+    
+    /* AI Assistant Modal with 9:16 aspect ratio - Phone-like appearance */
+    #aiAssistantModal .modal-content {
+      width: 300px; /* 9:16 aspect ratio with 533px height */
+      height: 533px; /* 9:16 aspect ratio when width is 300px (300*16/9) */
+      margin: 0 auto; /* Center the modal */
+      border-radius: 30px; /* More phone-like rounded corners */
+      overflow: hidden; /* Ensure content fits within rounded corners */
+      position: relative;
+    }
+    
+    /* Add phone-like status bar */
+    #aiAssistantModal .modal-header {
+      padding: 15px 20px 10px 20px;
+      background: linear-gradient(90deg, #262525, #212020);
+      border-radius: 30px 30px 0 0;
+      border-bottom: 1px solid #3a3939;
+      position: relative; /* Ensure proper stacking */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    /* Ensure modal body takes remaining space */
+    #aiAssistantModal .modal-body {
+      height: calc(100% - 60px); /* Account for header height */
+      position: relative;
+      padding: 0;
+      margin: 0;
+    }
+    
+    #aiAssistantModal .modal-header h2 {
+      font-size: 1.1rem;
+      text-align: center;
+      margin: 0;
+      flex: 1; /* Allow title to take available space */
+    }
+    
+    #aiAssistantModal .close {
+      position: static;
+      font-size: 1.5rem;
+      margin-left: auto; /* Push to the right */
+      cursor: pointer;
+    }
+    
+    /* For different screen sizes, maintain aspect ratio */
+    @media (min-width: 768px) {
+      #aiAssistantModal .modal-content {
+        width: 360px; /* 9:16 aspect ratio with 640px height */
+        height: 640px;
+        border-radius: 35px;
+      }
+      
+      #aiAssistantModal .modal-header {
+        border-radius: 35px 35px 0 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      #aiAssistantModal .modal-body {
+        height: calc(100% - 60px);
+      }
+    }
+    
+    /* Limited text in card */
+    .item-content-limited {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.6;
+      margin: 0;
+      flex-grow: 1;
+      padding: 8px 0;
+    }
+    
+    .read-more {
+      color: #ff6b39;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    
+    .read-more:hover {
+      text-decoration: underline;
+    }
+    
+    /* Search highlighting */
+    .highlight-search {
+      background-color: rgba(255, 179, 64, 0.3);
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-weight: 600;
+      color: #ffd58f;
+    }
+    
+    /* Additional modal styles for guides */
+    #guidesModal .modal-content {
+      background: linear-gradient(145deg, #262525, #212020);
+      margin: 5% auto;
+      padding: 0;
+      border: 1px solid #3a3939;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 900px;
+      max-height: 85vh;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: modalopen 0.3s ease;
+    }
+  </style>
+  
+  <!-- AI Assistant Modal -->
+  <div id="aiAssistantModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="close" id="closeAiAssistantModal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <iframe id="aiAssistantFrame" src="data/iframes/ai-assistant.html" frameborder="0" style="border: none; width: 100%; height: 100%;"></iframe>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Article Details Modal -->
+  <div id="articleModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Article Title</h2>
+        <span class="close" id="closeArticleModal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="modal-category">
+          <span id="modalCategory" class="item-tag">Category</span>
+        </div>
+        <div class="modal-image" id="modalImageContainer" style="display: none;">
+          <img id="modalImage" src="" alt="Article Image" style="width: 100%; border-radius: 12px; margin-bottom: 20px;">
+        </div>
+        <div class="modal-description" id="modalDescription">
+          <!-- Description will be inserted here -->
+        </div>
+        <div class="modal-content" id="modalContent">
+          <!-- Full content will be inserted here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Guides Modal -->
+  <div id="guidesModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Guides</h2>
+        <span class="close" id="closeGuidesModal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="guidesContent">
+          <!-- Guides will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</head>
+
+<body>
+  <div class="hero-showcase">
+    <div class="hero-content">
+      <h1 class="hero-title">Need help?</h1>
+      <p class="hero-subtitle">Explore comprehensive guides and information about the game</p>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <i class="fas fa-book stat-icon"></i>
+          <div class="stat-number" id="articlesCount">0</div>
+          <div class="stat-label">Articles</div>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-file-alt stat-icon"></i>
+          <div class="stat-number" id="guidesCount">0</div>
+          <div class="stat-label">Guides</div>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-layer-group stat-icon"></i>
+          <div class="stat-number" id="categoriesCount">0</div>
+          <div class="stat-label">Categories</div>
+        </div>
+      </div>
+      <div class="hero-buttons">
+        <button class="hero-btn primary" id="exploreBtn">
+          <i class="fas fa-compass"></i> AI Agent
+        </button>
+        <button class="hero-btn secondary" id="guidesBtn">
+          <i class="fas fa-book-open"></i> View Guides
+        </button>
+      </div>
+    </div>
+    <div class="article-of-day">
+      <h2 class="aot-title"><i class="fas fa-star"></i> Article of the Day</h2>
+      <div id="articleOfTheDayContent">
+        <p style="text-align: center; color: #888; padding: 20px;">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="logo">
+      <div class="logo-text">Facet Wiki</div>
+    </div>
+
+    <div class="search-container">
+      <div class="search-icon"><i class="fas fa-search"></i></div>
+      <input id="searchInput" type="search" placeholder="Search wiki articles..." />
+    </div>
+  </div>
+
+  <div id="itemGrid">
+    <div class="loading">
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
+
+  <script>
+    let isProUser = false;
+
+    window.addEventListener('load', function () {
+      if (window.parent) {
+        window.parent.postMessage({ action: 'getUserStatus' }, '*');
+      }
+    });
+
+    window.addEventListener('message', function (event) {
+      if (event.data && event.data.action) {
+        if (event.data.action === 'hideAds' && (event.data.userType === 'Pro' || event.data.userType === 'YT Pro')) {
+          isProUser = true;
+        } else if (event.data.action === 'showAds') {
+          isProUser = false;
+        }
+      }
+    });
+
+    let itemsData = [];
+
+    const grid = document.getElementById('itemGrid');
+    grid.innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Loading wiki data...</p></div>';
+
+    fetch('data/wiki.json')
+      .then(response => response.json())
+      .then(data => {
+        itemsData = data;
+
+        setTimeout(() => {
+          renderItems(itemsData);
+          initArticleOfTheDay(); 
+
+          const searchInput = document.getElementById('searchInput');
+          let searchTimeout;
+          
+          searchInput.addEventListener('input', e => {
+            const searchTerm = e.target.value;
+            
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+            
+            // Add a small delay to prevent excessive filtering while typing
+            searchTimeout = setTimeout(() => {
+              const filteredItems = performSearch(searchTerm);
+              renderItems(filteredItems, searchTerm);
+            }, 150);
+          });
+          
+          // Cache for search results to improve performance
+          let searchCache = {};
+          
+          // Fuzzy search function
+          function performSearch(searchTerm) {
+            if (!searchTerm) return itemsData;
+            
+            const term = searchTerm.toLowerCase().trim();
+            if (!term) return itemsData;
+            
+            // Check if we already have results for this search term
+            if (searchCache[term]) {
+              return searchCache[term];
+            }
+            
+            // Calculate fuzzy match scores for each item
+            const scoredItems = itemsData.map(item => {
+              let score = 0;
+              
+              // Title matching gets higher score
+              if (item.title) {
+                const titleMatch = fuzzyMatch(item.title.toLowerCase(), term);
+                if (titleMatch.score > 0) score += titleMatch.score * 3; // Weight title matches higher
+              }
+              
+              // Tag matching
+              if (item.tag) {
+                const tagMatch = fuzzyMatch(item.tag.toLowerCase(), term);
+                if (tagMatch.score > 0) score += tagMatch.score * 2; // Weight tag matches medium
+              }
+              
+              // Description matching
+              if (item.description) {
+                const descMatch = fuzzyMatch(item.description.toLowerCase(), term);
+                if (descMatch.score > 0) score += descMatch.score;
+              }
+              
+              // Content matching (only for shorter content to improve performance)
+              if (item.content) {
+                // Limit content search to first 500 characters to improve performance
+                const contentToSearch = item.content.length > 500 ? item.content.substring(0, 500) : item.content;
+                const contentMatch = fuzzyMatch(contentToSearch.toLowerCase(), term);
+                if (contentMatch.score > 0) score += contentMatch.score * 0.5; // Weight content matches lower
+              }
+              
+              return { item, score };
+            });
+            
+            // Filter items with score > 0 and sort by score
+            const results = scoredItems
+              .filter(result => result.score > 0)
+              .sort((a, b) => b.score - a.score)
+              .map(result => result.item);
+              
+            // Cache the results (limit cache size to prevent memory issues)
+            if (Object.keys(searchCache).length > 50) {
+              // Clear cache if it gets too large
+              searchCache = {};
+            }
+            searchCache[term] = results;
+            
+            return results;
+          }
+          
+          // Fuzzy matching algorithm
+          function fuzzyMatch(str, pattern) {
+            if (!pattern || !str) return { score: 0, matchedIndices: [] };
+            
+            let score = 0;
+            let patternIdx = 0;
+            let strIdx = 0;
+            let matches = [];
+            let consecutiveMatches = 0;
+            
+            while (strIdx < str.length && patternIdx < pattern.length) {
+              const strChar = str[strIdx];
+              const patternChar = pattern[patternIdx];
+              
+              if (strChar === patternChar) {
+                matches.push(strIdx);
+                score += 1 + consecutiveMatches; // Bonus for consecutive matches
+                consecutiveMatches++;
+                patternIdx++;
+              } else {
+                consecutiveMatches = 0; // Reset consecutive counter
+              }
+              
+              strIdx++;
+            }
+            
+            // Only return a score if we matched the entire pattern
+            return patternIdx === pattern.length 
+              ? { score: score, matchedIndices: matches } 
+              : { score: 0, matchedIndices: [] };
+          }
+        }, 500);
+      });
+
+    function updateStats() {
+      const articlesCount = itemsData.length;
+      const guidesCount = itemsData.filter(item => item.tag.toLowerCase().includes('guide') || item.title.toLowerCase().includes('guide')).length;
+      const categories = [...new Set(itemsData.map(item => item.tag))];
+      const categoriesCount = categories.length;
+      
+      document.getElementById('articlesCount').textContent = articlesCount;
+      document.getElementById('guidesCount').textContent = guidesCount;
+      document.getElementById('categoriesCount').textContent = categoriesCount;
+      
+      const statItems = document.querySelectorAll('.stat-item');
+      statItems.forEach((item, index) => {
+        setTimeout(() => {
+          item.classList.add('animate-in');
+        }, 200 * index);
+      });
+    }
+    
+    function renderItems(items, searchTerm = '') {
+      const grid = document.getElementById('itemGrid');
+
+      if (!items || items.length === 0) {
+        grid.innerHTML = '<div class="no-results"><i class="fas fa-search" style="font-size: 3rem; margin-bottom: 16px;"></i><h3>No results found</h3><p>Try a different search term or category</p></div>';
+        return;
+      }
+
+      grid.innerHTML = '';
+
+      items.forEach((item, index) => {
+        if (!isProUser && index > 0 && index % (Math.floor(Math.random() * 3) + 5) === 0) {
+          const adElement = document.createElement('div');
+          adElement.className = 'item-card';
+          adElement.style.animationDelay = `${index * 0.1}s`;
+
+          adElement.innerHTML = `
+            <div class="item-header">
+              <h3 class="item-title">Advertisement</h3>
+              <span class="item-tag">Ad</span>
+            </div>
+            <div class="item-content">
+              <p style="color:#888; text-align:center; font-style:italic;">No ads for now</p>
+            </div>
+          `;
+
+          grid.appendChild(adElement);
+        }
+
+        const itemElement = document.createElement('div');
+        itemElement.className = 'item-card';
+        itemElement.style.animationDelay = `${index * 0.1}s`;
+        
+        // Highlight search terms in content
+        let shortContent = item.content;
+        if (item.content.length > 200) {
+          shortContent = item.content.substring(0, 200) + '...';
+        }
+        
+        // Highlight search terms if applicable
+        let highlightedTitle = item.title;
+        let highlightedDescription = item.description;
+        let highlightedContent = shortContent;
+        
+        if (searchTerm) {
+          highlightedTitle = highlightSearchTerms(item.title, searchTerm);
+          highlightedDescription = highlightSearchTerms(item.description, searchTerm);
+          highlightedContent = highlightSearchTerms(shortContent, searchTerm);
+        }
+
+        itemElement.innerHTML = `
+          <div class="item-header">
+            <h3 class="item-title">${highlightedTitle}</h3>
+            <span class="item-tag">${item.tag}</span>
+          </div>
+          <p class="item-description">${highlightedDescription}</p>
+          <div class="item-content-limited">${highlightedContent}</div>
+          <div class="read-more">Read more</div>
+        `;
+        
+        itemElement.addEventListener('click', function(e) {
+          if (!e.target.classList.contains('read-more')) {
+            openArticleModal(item, searchTerm);
+          }
+        });
+        
+        const readMore = itemElement.querySelector('.read-more');
+        if (readMore) {
+          readMore.addEventListener('click', function() {
+            openArticleModal(item, searchTerm);
+          });
+        }
+
+        grid.appendChild(itemElement);
+      });
+      
+      updateStats();
+    }
+    
+    function formatContent(content) {
+      const lines = content.split('\n');
+      
+      let formattedContent = '';
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        if (line === '') {
+          continue; 
+        }
+        
+        if (line.includes(':') && /^[A-Z]/.test(line)) {
+          const colonIndex = line.indexOf(':');
+          const header = line.substring(0, colonIndex);
+          const value = line.substring(colonIndex + 1).trim();
+          
+          formattedContent += `<div class="item-property"><span class="property-key">${header}:</span> <span class="property-value">${value}</span></div>`;
+        } else {
+          formattedContent += `<p>${line}</p>`;
+        }
+      }
+      
+      return formattedContent;
+    }
+    
+    // Function to highlight search terms in text
+    function highlightSearchTerms(text, searchTerm) {
+      if (!searchTerm || !text) return text;
+      
+      // Escape special regex characters in the search term
+      const escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\$&');
+      
+      // Create a case-insensitive regex to find the search term
+      const regex = new RegExp(`(${escapedTerm})`, 'gi');
+      
+      // Replace matches with highlighted spans
+      return text.replace(regex, '<span class="highlight-search">$1</span>');
+    }
+    
+    function openArticleModal(item, searchTerm = '') {
+      // Highlight search terms in the modal if a search term is provided
+      const modalTitle = searchTerm ? highlightSearchTerms(item.title, searchTerm) : item.title;
+      const modalDescription = searchTerm ? highlightSearchTerms(item.description, searchTerm) : item.description;
+      const modalContent = searchTerm ? highlightSearchTerms(formatContent(item.content), searchTerm) : formatContent(item.content);
+      
+      document.getElementById('modalTitle').innerHTML = modalTitle;
+      document.getElementById('modalCategory').textContent = item.tag;
+      document.getElementById('modalDescription').innerHTML = modalDescription;
+      document.getElementById('modalContent').innerHTML = modalContent;
+      
+      const imageContainer = document.getElementById('modalImageContainer');
+      const imageElement = document.getElementById('modalImage');
+      
+      if (item.image) {
+        imageElement.src = item.image;
+        imageContainer.style.display = 'block';
+      } else {
+        imageContainer.style.display = 'none';
+      }
+      
+      document.getElementById('articleModal').style.display = 'block';
+    }
+    
+    document.getElementById('closeArticleModal').addEventListener('click', function() {
+      const modal = document.getElementById('articleModal');
+      modal.style.display = 'none';
+      modal.classList.remove('display-flex');
+    });
+    
+    document.getElementById('closeGuidesModal').addEventListener('click', function() {
+      const modal = document.getElementById('guidesModal');
+      modal.style.display = 'none';
+      modal.classList.remove('display-flex');
+    });
+    
+    // AI Assistant Modal Event Listeners
+    document.getElementById('closeAiAssistantModal').addEventListener('click', function() {
+      const modal = document.getElementById('aiAssistantModal');
+      modal.style.display = 'none';
+      modal.classList.remove('display-flex');
+    });
+    
+    window.addEventListener('click', function(event) {
+      const articleModal = document.getElementById('articleModal');
+      const guidesModal = document.getElementById('guidesModal');
+      const aiAssistantModal = document.getElementById('aiAssistantModal');
+      
+      if (event.target === articleModal) {
+        articleModal.style.display = 'none';
+        articleModal.classList.remove('display-flex');
+      }
+      
+      if (event.target === guidesModal) {
+        guidesModal.style.display = 'none';
+        guidesModal.classList.remove('display-flex');
+      }
+      
+      if (event.target === aiAssistantModal) {
+        aiAssistantModal.style.display = 'none';
+        aiAssistantModal.classList.remove('display-flex');
+      }
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const exploreBtn = document.getElementById('exploreBtn');
+      const guidesBtn = document.getElementById('guidesBtn');
+      
+      if (exploreBtn) {
+        exploreBtn.addEventListener('click', function() {
+          // Open the AI assistant modal
+          const modal = document.getElementById('aiAssistantModal');
+          modal.style.display = 'flex';
+          modal.classList.add('display-flex');
+        });
+      }
+      
+      if (guidesBtn) {
+        guidesBtn.addEventListener('click', function() {
+          showGuidesModal();
+        });
+      }
+    });
+    
+    function showGuidesModal() {
+      const guidesContent = document.getElementById('guidesContent');
+      
+      guidesContent.innerHTML = '<div style="text-align: center; padding: 40px 20px;"><h3 style="color: #f78c5a; margin-bottom: 20px;">Coming Soon</h3><p style="color: #bbb; font-size: 1.1rem;">Guides section will be available in a future update.</p></div>';
+      
+      document.getElementById('guidesModal').style.display = 'block';
+    }
+    
+    function getArticleOfTheDay(items) {
+      if (!items || items.length === 0) return null;
+      
+      const today = new Date();
+      const dateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+      
+      let hash = 0;
+      for (let i = 0; i < dateStr.length; i++) {
+        const char = dateStr.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; 
+      }
+      
+     
+      const index = Math.abs(hash) % items.length;
+      return items[index];
+    }
+    
+    function displayArticleOfTheDay() {
+      const articleOfTheDayContent = document.getElementById('articleOfTheDayContent');
+      
+      if (itemsData && itemsData.length > 0) {
+        const articleOfTheDay = getArticleOfTheDay(itemsData);
+        
+        if (articleOfTheDay) {
+          let shortContent = articleOfTheDay.content;
+          if (articleOfTheDay.content.length > 150) {
+            shortContent = articleOfTheDay.content.substring(0, 150) + '...';
+          }
+          
+          articleOfTheDayContent.innerHTML = `
+            <div class="aot-item">
+              <div class="aot-header">
+                <h3 class="aot-title-item">${articleOfTheDay.title}</h3>
+                <span class="aot-tag">${articleOfTheDay.tag}</span>
+              </div>
+              <p class="aot-description">${articleOfTheDay.description}</p>
+              <div class="aot-content">${shortContent}</div>
+            </div>
+          `;
+        }
+      } else {
+        articleOfTheDayContent.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">No articles available.</p>';
+      }
+    }
+    
+    function initArticleOfTheDay() {
+      if (itemsData && itemsData.length > 0) {
+        displayArticleOfTheDay();
+      } else {
+        const checkData = setInterval(() => {
+          if (itemsData && itemsData.length > 0) {
+            clearInterval(checkData);
+            displayArticleOfTheDay();
+          }
+        }, 100);
+      }
+    }
+    
+    // Debounced search function for performance
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+    
+    document.addEventListener('DOMContentLoaded', initArticleOfTheDay);
+  </script>
+</body>
+
+</html>
